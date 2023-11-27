@@ -1,12 +1,10 @@
 package br.unirio;
 
-import com.sun.source.tree.EnhancedForLoopTree;
-
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.Scanner;
+import java.awt.*;
+import java.io.File;
+import java.util.*;
+import java.util.List;
+import java.util.random.RandomGenerator;
 
 public class OrdenacaoTopologica
 {
@@ -14,24 +12,24 @@ public class OrdenacaoTopologica
 	{
 		/* Identifica��o do elemento. */
 		public int chave;
-		
+
 		/* N�mero de predecessores. */
 		public int contador;
-		
+
 		/* Aponta para o pr�ximo elo da lista. */
 		public Elo prox;
-		
+
 		/* Aponta para o primeiro elemento da lista de sucessores. */
-		public EloSuc listaSuc;
-		
+		public EloSucessor listaSuc;
+
 		public Elo()
 		{
 			prox = null;
 			contador = 0;
 			listaSuc = null;
 		}
-		
-		public Elo(int chave, int contador, Elo prox, EloSuc listaSuc)
+
+		public Elo(int chave, int contador, Elo prox, EloSucessor listaSuc)
 		{
 			this.chave = chave;
 			this.contador = contador;
@@ -39,22 +37,22 @@ public class OrdenacaoTopologica
 			this.listaSuc = listaSuc;
 		}
 	}
-	
-	private class EloSuc
+
+	private class EloSucessor
 	{
 		/* Aponta para o elo que � sucessor. */
 		public Elo id;
-		
+
 		/* Aponta para o pr�ximo elemento. */
-		public EloSuc prox;
-		
-		public EloSuc()
+		public EloSucessor prox;
+
+		public EloSucessor()
 		{
 			id = null;
 			prox = null;
 		}
-		
-		public EloSuc(Elo id, EloSuc prox)
+
+		public EloSucessor(Elo id, EloSucessor prox)
 		{
 			this.id = id;
 			this.prox = prox;
@@ -64,102 +62,147 @@ public class OrdenacaoTopologica
 
 	/* Ponteiro (refer�ncia) para primeiro elemento da lista. */
 	private Elo prim;
-	
+
 	/* N�mero de elementos na lista. */
 	private int n;
-		
+
 	public OrdenacaoTopologica()
 	{
 		prim = null;
 		n = 0;
 	}
 
-	public void montarLista(){
+	public void montarGrafo(int numeroVertices){
+
+		Random random = new Random();
+
+		List<Integer> vertices = new ArrayList<Integer>();
+
+		for(int i = 0; i < numeroVertices; i++){
+			vertices.add(i);
+		}
+
+		for(int i = 0; i <numeroVertices; i++){
+			int predecessor = vertices.get(random.nextInt(numeroVertices));
+			int sucessor = vertices.get(random.nextInt(numeroVertices));
+			lerLinhaSemScanner(predecessor, sucessor);
+		}
 
 	}
 
 	/* M�todo respons�vel pela leitura do arquivo de entrada. */
 	public void realizaLeitura(String nomeEntrada)
 	{
-		int predecessorCorrente;
-		int sucessorCorrente;
-
-
 		try {
-			FileReader fileReader = new FileReader(nomeEntrada);
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
+			this.lerArquivo(nomeEntrada);
+		} catch (Exception err) {
+			System.out.println("Erro ao ler o arquivo.");
+			err.printStackTrace();
 		}
-
-		try (BufferedReader br = new BufferedReader(new FileReader(nomeEntrada))) {
-			String line;
-			while ((line = br.readLine()) != null) {
-				int cont = 0;
-				String stringNumber = "";
-				while(true){
-					if(!Character.isDigit(line.charAt(cont)))
-						break;
-					stringNumber += line.charAt(cont);
-					cont ++;
-				}
-				predecessorCorrente = Integer.parseInt(stringNumber);
-
-				stringNumber = "";
-				while(cont < line.length()){
-					if(Character.isDigit(line.charAt(cont))) {
-						stringNumber += line.charAt(cont);
-						cont++;
-					} else if(stringNumber.length() != 0){
-						break;
-					}
-					if(stringNumber.length() == 0)
-						cont++;
-				}
-				sucessorCorrente = Integer.parseInt(stringNumber);
-				alocaNumeros(predecessorCorrente, sucessorCorrente);
-			}
-		} catch (IOException e) {
-			System.out.println("Arquivo não encontrado");
-		}
-
 	}
-	
-	/* M�todo para impress�o do estado atual da estrutura de dados. */
+
+	private void lerArquivo(String nomeArquivo) throws Exception {
+		File file = new File(nomeArquivo);
+		Scanner scanner = new Scanner(file);
+
+		while (scanner.hasNextLine()) {
+			this.lerLinha(scanner);
+		}
+
+		scanner.close();
+	}
+
+	private void lerLinhaSemScanner(int chavePredecessor, int chaveSucessor) {
+
+		Elo predecessor = this.buscar(chavePredecessor);
+		if (predecessor == null) predecessor = this.adicionarVertice(chavePredecessor);
+
+		Elo sucessor = this.buscar(chaveSucessor);
+		if (sucessor == null) sucessor = this.adicionarVertice(chaveSucessor);
+
+		this.adicionarSucessor(predecessor, sucessor);
+	}
+
+	private void lerLinha(Scanner scanner) {
+		String data = scanner.nextLine();
+		String[] elementos = data.split("\\s*<\\s*");
+
+		int predecessorChave = Integer.parseInt(elementos[0]);
+		int sucessorChave = Integer.parseInt(elementos[1]);
+
+		Elo predecessor = this.buscar(predecessorChave);
+		if (predecessor == null) predecessor = this.adicionarVertice(predecessorChave);
+
+		Elo sucessor = this.buscar(sucessorChave);
+		if (sucessor == null) sucessor = this.adicionarVertice(sucessorChave);
+
+		this.adicionarSucessor(predecessor, sucessor);
+	}
+
+	private Elo adicionarVertice(int chave) {
+		this.n++;
+
+		if (this.prim == null) {
+			this.prim = new Elo();
+			this.prim.chave = chave;
+			return this.prim;
+		}
+
+		Elo corrente = this.prim;
+		while (corrente.prox != null) { corrente = corrente.prox; }
+
+		Elo elo = new Elo();
+		elo.chave = chave;
+		corrente.prox = elo;
+
+		return elo;
+	}
+
+	private void adicionarSucessor(Elo predecessor, Elo sucessor) {
+		sucessor.contador++;
+
+		if (predecessor.listaSuc == null) {
+			predecessor.listaSuc = new EloSucessor();
+			predecessor.listaSuc.id = sucessor;
+			return;
+		};
+
+		EloSucessor sucessorCorrente = predecessor.listaSuc;
+
+		EloSucessor novoSucessor = new EloSucessor();
+		novoSucessor.id = sucessor;
+		novoSucessor.prox = sucessorCorrente;
+		predecessor.listaSuc = novoSucessor;
+	}
+
+
+	// O(n)
+	private Elo buscar(int chave) {
+		return this.prim != null ? this.buscarRecursivo(chave, this.prim) : null;
+	}
+
+	// O(n)
+	private Elo buscarRecursivo(int chave, Elo eloCorrente) {
+		if (eloCorrente == null) return null;
+		if (chave == eloCorrente.chave) return eloCorrente;
+
+		return this.buscarRecursivo(chave, eloCorrente.prox);
+	}
+
 	private void debug()
 	{
-
-	}
-
-	private void alocaNumeros(int predecessorCorrente, int sucessorCorrente){
-		if(prim == null){
-			Elo sucessor = new Elo(sucessorCorrente, 1, null, null);
-			Elo predecessor = new Elo(predecessorCorrente, 0, sucessor, new EloSuc(sucessor, null));
-			predecessor.prox = sucessor;
-			prim = predecessor;
-		}else{
-			Elo p = prim;
-			int contador = 0;
-			Elo sucessor = new Elo();
-			while(p != null){
-				while(p.listaSuc != null){
-					if(p.chave == predecessorCorrente){
-						Elo predecessor = new Elo(sucessorCorrente, contador, null, null);
-						p.listaSuc.prox = new EloSuc(predecessor, null);
-					}
-					p.listaSuc = p.listaSuc.prox;
-				}
-
-				p = p.prox;
+		for (Elo p = this.prim; p != null; p = p.prox) {
+			System.out.print(p.chave + " predecessores: " + p.contador + ", sucessores: ");
+			for (EloSucessor s = p.listaSuc; s != null; s = s.prox) {
+				System.out.print(s.id.chave + " -> ");
 			}
+			System.out.println("NULL");
 		}
-
 	}
 
-	/* M�todo respons�vel por executar o algoritmo. */
 	public boolean executa()
 	{
-		/* Preencher. */
-		
+		this.debug();
 		return false;
 	}
 }

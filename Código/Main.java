@@ -4,15 +4,46 @@ public class Main
 {
 	public static void main(String args[])
 	{
+		final int numeroVertices = 10;
 		OrdenacaoTopologica ord = new OrdenacaoTopologica();
-		
-		String nomeEntrada = "C:\\Users\\Emidio\\Desktop\\Trabalho Final\\Código\\entrada.txt";
-		
-		ord.realizaLeitura(nomeEntrada);
 
-		if(!ord.executa())
-			System.out.println("O conjunto nao é parcialmente ordenado.");
-		else
-			System.out.println("O conjunto é parcialmente ordenado.");
+		String nomeEntrada = "src/entrada.txt";
+		ord.montarGrafo(numeroVertices);
+
+		ord.realizaLeitura(nomeEntrada);
+		ord.executa();
+
+		/*
+
+			Criar uma Lista com os Elementos que não tem predecessores
+
+				 busca elementos sem predecessores
+				p = prim; prim = NULL;
+				WHILE p # NULL DO
+				 q = p;
+				 p = q->prox;
+				 IF q->contador == 0 THEN
+				  insere q na nova cadeia
+				 q->prox = prim;
+				 prim = q;
+				 END
+				END
+
+
+				para cada elemento q da lista de elementos com zero
+				predecessores
+					 imprimir a chave de q;
+				 		decrementar o número de elementos da lista (n);
+				 			para cada elemento t da lista de sucessores de q
+				 decrementar o contador do predecessor de t
+				 se o contador de t se tornar zero,
+				 insere este elemento no fim da lista de
+				elementos com zero predecessores
+				 remover o elemento t da lista de sucessores de q
+				 remover o elemento q da lista de elementos com zero
+				predecessores
+				fim-para
+
+		 */
 	}
 }
