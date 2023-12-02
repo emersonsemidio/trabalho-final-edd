@@ -8,10 +8,13 @@ public class Main
 		OrdenacaoTopologica ord = new OrdenacaoTopologica();
 
 		String nomeEntrada = "src/entrada.txt";
-		ord.montarGrafo(numeroVertices);
+		//ord.montarGrafo(numeroVertices);
 
-		ord.realizaLeitura(nomeEntrada);
+		//ord.realizaLeitura(nomeEntrada);
+
+		ord.geraGrafo(numeroVertices, 0.13);
 		ord.executa();
+
 
 		/*
 

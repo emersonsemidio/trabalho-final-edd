@@ -1,10 +1,6 @@
 package br.unirio;
 
-import java.awt.*;
-import java.io.File;
 import java.util.*;
-import java.util.List;
-import java.util.random.RandomGenerator;
 
 public class OrdenacaoTopologica
 {
@@ -71,7 +67,7 @@ public class OrdenacaoTopologica
 		prim = null;
 		n = 0;
 	}
-
+/*
 	public void montarGrafo(int numeroVertices){
 
 		Random random = new Random();
@@ -82,15 +78,18 @@ public class OrdenacaoTopologica
 			vertices.add(i);
 		}
 
-		for(int i = 0; i <numeroVertices; i++){
+		for(int i = 0; i <numeroVertices*2; i++){
 			int predecessor = vertices.get(random.nextInt(numeroVertices));
 			int sucessor = vertices.get(random.nextInt(numeroVertices));
 			lerLinhaSemScanner(predecessor, sucessor);
 		}
 
+		montarListaFinal();
+
 	}
 
-	/* M�todo respons�vel pela leitura do arquivo de entrada. */
+
+
 	public void realizaLeitura(String nomeEntrada)
 	{
 		try {
@@ -112,6 +111,104 @@ public class OrdenacaoTopologica
 		scanner.close();
 	}
 
+*/
+	//O(n^2)
+	public void geraGrafo(int n, double probabilidade) {
+		Random random = new Random();
+
+		// Criar vértices
+		for (int i = 0; i < n; i++) {
+			adicionarVertice(i);
+		}
+
+		// Adicionar arestas com probabilidade p
+		for (Elo eloAtual = prim; eloAtual != null; eloAtual = eloAtual.prox) {
+			for (int i = 0; i < n; i++) {
+				Double valorAleatorio = random.nextDouble();
+				if (i != eloAtual.chave && valorAleatorio < probabilidade) {
+					adicionarAresta(eloAtual.chave, i);
+				}
+			}
+		}
+
+		listaSemPredecessores();
+	}
+	//O(1)
+	public void adicionarVertice(int chave) {
+		Elo novoElo = new Elo(chave, 0, prim, null);
+		prim = novoElo;
+		n++;
+	}
+
+	//O(N + M)
+	public void adicionarAresta(int origem, int destino) {
+		Elo eloOrigem = encontrarElo(origem);
+		Elo eloDestino = encontrarElo(destino);
+
+		if (eloOrigem != null && eloDestino != null && !verificarCiclo(eloDestino, eloOrigem)) {
+			EloSucessor novoSucessor = new EloSucessor(eloDestino, eloOrigem.listaSuc);
+			eloOrigem.listaSuc = novoSucessor;
+			eloDestino.contador++;
+		}
+	}
+
+	//O(S) onde S é o tamanho da lista de sucessores
+	private boolean verificarCiclo(Elo origem, Elo destino) {
+		// Verifica se há um ciclo ao percorrer os sucessores de origem
+		for (EloSucessor sucessor = origem.listaSuc; sucessor != null; sucessor = sucessor.prox) {
+			if (sucessor.id == destino) {
+				return true; // Ciclo encontrado
+			}
+		}
+		return false; // Não há ciclo
+	}
+	//O(n)
+	public Elo encontrarElo(int chave) {
+		for (Elo eloAtual = prim; eloAtual != null; eloAtual = eloAtual.prox) {
+			if (eloAtual.chave == chave) {
+				return eloAtual;
+			}
+		}
+		return null;
+	}
+
+	//O(n)
+	public void listaSemPredecessores(){
+
+		Elo p = prim;
+		Elo antigoPrim;
+		prim = null;
+		Elo elementoCorrente;
+
+		while(p!= null){
+			elementoCorrente = p;
+			p = elementoCorrente.prox;
+			if(elementoCorrente.contador == 0){
+				Elo novoElo = new Elo(elementoCorrente.chave, 0, elementoCorrente, elementoCorrente.listaSuc);
+				antigoPrim = prim;
+				prim = novoElo;
+				prim.prox = antigoPrim;
+			}
+		}
+	}
+
+	public void imprimirElementos(){
+		Elo aux;
+
+		for(aux = prim; aux != null; aux=aux.prox){
+			System.out.println(aux.chave);
+
+			n--;
+
+			for (EloSucessor sucessor = aux.listaSuc; sucessor != null; sucessor = sucessor.prox) {
+
+			}
+		}
+
+	}
+
+
+/*
 	private void lerLinhaSemScanner(int chavePredecessor, int chaveSucessor) {
 
 		Elo predecessor = this.buscar(chavePredecessor);
@@ -188,6 +285,7 @@ public class OrdenacaoTopologica
 
 		return this.buscarRecursivo(chave, eloCorrente.prox);
 	}
+*/
 
 	private void debug()
 	{
@@ -205,4 +303,5 @@ public class OrdenacaoTopologica
 		this.debug();
 		return false;
 	}
+
 }
