@@ -132,6 +132,7 @@ public class OrdenacaoTopologica
 		}
 
 		listaSemPredecessores();
+		imprimirElementos();
 	}
 	//O(1)
 	public void adicionarVertice(int chave) {
@@ -172,6 +173,15 @@ public class OrdenacaoTopologica
 		return null;
 	}
 
+	public EloSucessor encontrarEloComPredecessor() {
+		for (Elo eloAtual = prim; eloAtual != null; eloAtual = eloAtual.prox) {
+			if(eloAtual.listaSuc != null){
+				return eloAtual.listaSuc;
+			}
+		}
+		return null;
+	}
+
 	//O(n)
 	public void listaSemPredecessores(){
 
@@ -184,27 +194,53 @@ public class OrdenacaoTopologica
 			elementoCorrente = p;
 			p = elementoCorrente.prox;
 			if(elementoCorrente.contador == 0){
-				Elo novoElo = new Elo(elementoCorrente.chave, 0, elementoCorrente, elementoCorrente.listaSuc);
-				antigoPrim = prim;
-				prim = novoElo;
-				prim.prox = antigoPrim;
+				if(elementoCorrente.listaSuc != null){
+					Elo novoElo = new Elo(elementoCorrente.chave, 0, elementoCorrente, elementoCorrente.listaSuc);
+					antigoPrim = prim;
+					prim = novoElo;
+					prim.prox = antigoPrim;
+				}else{
+					Elo novoElo = new Elo(elementoCorrente.chave, 0, elementoCorrente, encontrarEloComPredecessor());
+					antigoPrim = prim;
+					prim = novoElo;
+					prim.prox = antigoPrim;
+				}
+
+
 			}
+
 		}
 	}
 
+	//O(n + m)
 	public void imprimirElementos(){
-		Elo aux;
 
+		Elo aux;
 		for(aux = prim; aux != null; aux=aux.prox){
 			System.out.println(aux.chave);
-
 			n--;
-
 			for (EloSucessor sucessor = aux.listaSuc; sucessor != null; sucessor = sucessor.prox) {
+				sucessor.id.contador--;
 
+				if(sucessor.id.contador== 0){
+					Elo ult = percorrerLista();
+					ult.prox = sucessor.id;
+					sucessor.id.prox = null;
+
+					aux.listaSuc = sucessor.prox;
+
+				}
 			}
+			
 		}
+	}
 
+	public Elo percorrerLista() {
+		Elo eloAtual;
+
+		for (eloAtual = prim; eloAtual.prox != null; eloAtual = eloAtual.prox);
+
+		return eloAtual;
 	}
 
 

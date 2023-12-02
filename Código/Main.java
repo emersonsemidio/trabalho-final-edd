@@ -4,7 +4,7 @@ public class Main
 {
 	public static void main(String args[])
 	{
-		final int numeroVertices = 10;
+		final int numeroVertices = 5;
 		OrdenacaoTopologica ord = new OrdenacaoTopologica();
 
 		String nomeEntrada = "src/entrada.txt";
