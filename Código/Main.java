@@ -12,8 +12,8 @@ public class Main
 
 		//ord.realizaLeitura(nomeEntrada);
 
-		ord.geraGrafo(numeroVertices, 0.13);
-		ord.executa();
+		ord.incializar();
+		//ord.executa();
 
 
 		/*

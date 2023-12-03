@@ -112,10 +112,42 @@ public class OrdenacaoTopologica
 	}
 
 */
+
+	public void incializar() {
+		// Vetor de inteiros fornecido como argumento
+		int[] vetorParametro = {10, 20, 30, 40, 50, 100, 200, 500, 1000, 5000, 10000, 20000, 30000, 50000, 100000};
+
+		for (int valor : vetorParametro) {
+			double tempoMedio = medirTempoMedio(valor);
+			System.out.printf("Para o valor %d: Tempo medio = %.6f segundos %n", valor, tempoMedio);
+		}
+	}
+
+	public double medirTempoMedio(int valor) {
+		// Roda a função 10 vezes e calcula o tempo médio
+		long[] tempos = new long[10];
+		for (int i = 0; i < 10; i++) {
+			long inicio = System.currentTimeMillis();
+			geraGrafo(valor, 0.13);
+			long fim = System.currentTimeMillis();
+			tempos[i] = fim - inicio;
+		}
+
+		double tempoMedio = calcularMedia(tempos);
+		return tempoMedio / 1000.0; // Converte para segundos
+	}
+
+	private static double calcularMedia(long[] tempos) {
+		long soma = 0;
+		for (long tempo : tempos) {
+			soma += tempo;
+		}
+		return (double) soma / tempos.length;
+	}
+
 	//O(n^2)
 	public void geraGrafo(int n, double probabilidade) {
 		Random random = new Random();
-
 		// Criar vértices
 		for (int i = 0; i < n; i++) {
 			adicionarVertice(i);
@@ -212,12 +244,11 @@ public class OrdenacaoTopologica
 		}
 	}
 
-	//O(n + m)
+	//O(n*m)
 	public void imprimirElementos(){
 
 		Elo aux;
 		for(aux = prim; aux != null; aux=aux.prox){
-			System.out.println(aux.chave);
 			n--;
 			for (EloSucessor sucessor = aux.listaSuc; sucessor != null; sucessor = sucessor.prox) {
 				sucessor.id.contador--;
@@ -228,10 +259,9 @@ public class OrdenacaoTopologica
 					sucessor.id.prox = null;
 
 					aux.listaSuc = sucessor.prox;
-
 				}
 			}
-			
+		prim = aux.prox;
 		}
 	}
 
