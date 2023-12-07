@@ -1,5 +1,3 @@
-package br.unirio;
-
 public class Main
 {
 	public static void main(String args[])
@@ -7,8 +5,8 @@ public class Main
 		final int numeroVertices = 20;
 		final double prob = 0.13;
 		OrdenacaoTopologica ord = new OrdenacaoTopologica();
-		//Colocar o caminho inteiro até o arquivo de entrada
-		String nomeEntrada = "C:\\Users\\Emidio\\Desktop\\Trabalho Final\\Código\\entrada.txt";
+		//Colocar o caminho inteiro atï¿½ o arquivo de entrada
+		String nomeEntrada = "C:\\Users\\Emidio\\Desktop\\Trabalho Final\\Cï¿½digo\\entrada.txt";
 
 
 
