@@ -118,9 +118,7 @@ public class OrdenacaoTopologica
 				}
 			}
 		}
-		debug();
-		listaSemPredecessores();
-		imprimirElementos();
+
 	}
 	//O(N)
 	public Elo adicionarVertice(int chave) {
@@ -291,9 +289,12 @@ public class OrdenacaoTopologica
 		}
 	}
 
-	public boolean executa()
+	public boolean executa(int tam, double prob)
 	{
+		geraGrafo(tam, prob);
 		this.debug();
+		listaSemPredecessores();
+		imprimirElementos();
 		return false;
 	}
 
