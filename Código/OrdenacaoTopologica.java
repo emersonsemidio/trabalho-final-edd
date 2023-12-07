@@ -1,5 +1,6 @@
 package br.unirio;
 
+import java.io.File;
 import java.util.*;
 
 public class OrdenacaoTopologica
@@ -67,51 +68,6 @@ public class OrdenacaoTopologica
 		prim = null;
 		n = 0;
 	}
-/*
-	public void montarGrafo(int numeroVertices){
-
-		Random random = new Random();
-
-		List<Integer> vertices = new ArrayList<Integer>();
-
-		for(int i = 0; i < numeroVertices; i++){
-			vertices.add(i);
-		}
-
-		for(int i = 0; i <numeroVertices*2; i++){
-			int predecessor = vertices.get(random.nextInt(numeroVertices));
-			int sucessor = vertices.get(random.nextInt(numeroVertices));
-			lerLinhaSemScanner(predecessor, sucessor);
-		}
-
-		montarListaFinal();
-
-	}
-
-
-
-	public void realizaLeitura(String nomeEntrada)
-	{
-		try {
-			this.lerArquivo(nomeEntrada);
-		} catch (Exception err) {
-			System.out.println("Erro ao ler o arquivo.");
-			err.printStackTrace();
-		}
-	}
-
-	private void lerArquivo(String nomeArquivo) throws Exception {
-		File file = new File(nomeArquivo);
-		Scanner scanner = new Scanner(file);
-
-		while (scanner.hasNextLine()) {
-			this.lerLinha(scanner);
-		}
-
-		scanner.close();
-	}
-
-*/
 
 	public void incializar() {
 		// Vetor de inteiros fornecido como argumento
@@ -125,8 +81,8 @@ public class OrdenacaoTopologica
 
 	public double medirTempoMedio(int valor) {
 		// Roda a função 10 vezes e calcula o tempo médio
-		long[] tempos = new long[10];
-		for (int i = 0; i < 10; i++) {
+		long[] tempos = new long[1];
+		for (int i = 0; i < 1; i++) {
 			long inicio = System.currentTimeMillis();
 			geraGrafo(valor, 0.13);
 			long fim = System.currentTimeMillis();
@@ -157,20 +113,30 @@ public class OrdenacaoTopologica
 		for (Elo eloAtual = prim; eloAtual != null; eloAtual = eloAtual.prox) {
 			for (int i = 0; i < n; i++) {
 				Double valorAleatorio = random.nextDouble();
-				if (i != eloAtual.chave && valorAleatorio < probabilidade) {
+				if (i != eloAtual.chave && (valorAleatorio < probabilidade) && i!= 0) {
 					adicionarAresta(eloAtual.chave, i);
 				}
 			}
 		}
-
+		debug();
 		listaSemPredecessores();
 		imprimirElementos();
 	}
-	//O(1)
-	public void adicionarVertice(int chave) {
-		Elo novoElo = new Elo(chave, 0, prim, null);
-		prim = novoElo;
-		n++;
+	//O(N)
+	public Elo adicionarVertice(int chave) {
+		Elo p, novoElo, ant;
+
+		if(prim == null){
+			novoElo = new Elo(chave, 0, null, null);
+			prim = novoElo;
+		}else{
+			novoElo = new Elo(chave, 0, null, null);
+			ant = percorrerLista();
+
+			ant.prox = novoElo;
+			n++;
+		}
+		return novoElo;
 	}
 
 	//O(N + M)
@@ -205,19 +171,9 @@ public class OrdenacaoTopologica
 		return null;
 	}
 
-	public EloSucessor encontrarEloComPredecessor() {
-		for (Elo eloAtual = prim; eloAtual != null; eloAtual = eloAtual.prox) {
-			if(eloAtual.listaSuc != null){
-				return eloAtual.listaSuc;
-			}
-		}
-		return null;
-	}
-
 	//O(n)
 	public void listaSemPredecessores(){
-
-		Elo p = prim;
+		Elo p = new Elo(prim.chave, 0, prim.prox, prim.listaSuc);
 		Elo antigoPrim;
 		prim = null;
 		Elo elementoCorrente;
@@ -226,45 +182,46 @@ public class OrdenacaoTopologica
 			elementoCorrente = p;
 			p = elementoCorrente.prox;
 			if(elementoCorrente.contador == 0){
-				if(elementoCorrente.listaSuc != null){
-					Elo novoElo = new Elo(elementoCorrente.chave, 0, elementoCorrente, elementoCorrente.listaSuc);
-					antigoPrim = prim;
-					prim = novoElo;
-					prim.prox = antigoPrim;
-				}else{
-					Elo novoElo = new Elo(elementoCorrente.chave, 0, elementoCorrente, encontrarEloComPredecessor());
-					antigoPrim = prim;
-					prim = novoElo;
-					prim.prox = antigoPrim;
-				}
-
-
+				Elo novoElo = new Elo(elementoCorrente.chave, 0, elementoCorrente, elementoCorrente.listaSuc);
+				antigoPrim = prim;
+				prim = novoElo;
+				prim.prox = antigoPrim;
 			}
-
 		}
 	}
 
-	//O(n*m)
+	//O(n^2)
 	public void imprimirElementos(){
 
+		System.out.println("Elementos sem predecessores");
 		Elo aux;
 		for(aux = prim; aux != null; aux=aux.prox){
 			n--;
+			System.out.print(aux.chave + ", ");
 			for (EloSucessor sucessor = aux.listaSuc; sucessor != null; sucessor = sucessor.prox) {
 				sucessor.id.contador--;
-
 				if(sucessor.id.contador== 0){
-					Elo ult = percorrerLista();
-					ult.prox = sucessor.id;
-					sucessor.id.prox = null;
+					if(aux.listaSuc == sucessor){
+						Elo ult = percorrerLista();
+						ult.prox = sucessor.id;
+						aux.listaSuc = sucessor.prox;
+						sucessor.id.prox = null;
 
-					aux.listaSuc = sucessor.prox;
+					}else{
+						EloSucessor antListSuc;
+						antListSuc = percorrerListaSucessores(aux.listaSuc, sucessor.id.chave);
+						antListSuc.prox = sucessor.prox;
+						Elo ult = percorrerLista();
+						ult.prox = sucessor.id;
+						sucessor.id.prox = null;
+
+					}
 				}
 			}
-		prim = aux.prox;
+			prim = aux.prox;
 		}
 	}
-
+	//O(n)
 	public Elo percorrerLista() {
 		Elo eloAtual;
 
@@ -273,17 +230,37 @@ public class OrdenacaoTopologica
 		return eloAtual;
 	}
 
+	//O(m) onde m é o tamanho da lista de sucessores
+	public EloSucessor percorrerListaSucessores(EloSucessor inicio, int elem){
+		EloSucessor ant = null;
+		EloSucessor p;
 
-/*
-	private void lerLinhaSemScanner(int chavePredecessor, int chaveSucessor) {
+		for(p = inicio; p.id.chave != elem; p=p.prox){
+			ant = p;
+		}
 
-		Elo predecessor = this.buscar(chavePredecessor);
-		if (predecessor == null) predecessor = this.adicionarVertice(chavePredecessor);
+		return ant;
+	}
 
-		Elo sucessor = this.buscar(chaveSucessor);
-		if (sucessor == null) sucessor = this.adicionarVertice(chaveSucessor);
+	public void realizaLeitura(String nomeEntrada)
+	{
+		try {
+			this.lerArquivo(nomeEntrada);
+		} catch (Exception err) {
+			System.out.println("Erro ao ler o arquivo.");
+			err.printStackTrace();
+		}
+	}
 
-		this.adicionarSucessor(predecessor, sucessor);
+	private void lerArquivo(String nomeArquivo) throws Exception {
+		File file = new File(nomeArquivo);
+		Scanner scanner = new Scanner(file);
+
+		while (scanner.hasNextLine()) {
+			this.lerLinha(scanner);
+		}
+
+		scanner.close();
 	}
 
 	private void lerLinha(Scanner scanner) {
@@ -293,66 +270,16 @@ public class OrdenacaoTopologica
 		int predecessorChave = Integer.parseInt(elementos[0]);
 		int sucessorChave = Integer.parseInt(elementos[1]);
 
-		Elo predecessor = this.buscar(predecessorChave);
+		Elo predecessor = this.encontrarElo(predecessorChave);
 		if (predecessor == null) predecessor = this.adicionarVertice(predecessorChave);
 
-		Elo sucessor = this.buscar(sucessorChave);
+		Elo sucessor = this.encontrarElo(sucessorChave);
 		if (sucessor == null) sucessor = this.adicionarVertice(sucessorChave);
 
-		this.adicionarSucessor(predecessor, sucessor);
+		this.adicionarAresta(predecessor.chave, sucessor.chave);
 	}
 
-	private Elo adicionarVertice(int chave) {
-		this.n++;
-
-		if (this.prim == null) {
-			this.prim = new Elo();
-			this.prim.chave = chave;
-			return this.prim;
-		}
-
-		Elo corrente = this.prim;
-		while (corrente.prox != null) { corrente = corrente.prox; }
-
-		Elo elo = new Elo();
-		elo.chave = chave;
-		corrente.prox = elo;
-
-		return elo;
-	}
-
-	private void adicionarSucessor(Elo predecessor, Elo sucessor) {
-		sucessor.contador++;
-
-		if (predecessor.listaSuc == null) {
-			predecessor.listaSuc = new EloSucessor();
-			predecessor.listaSuc.id = sucessor;
-			return;
-		};
-
-		EloSucessor sucessorCorrente = predecessor.listaSuc;
-
-		EloSucessor novoSucessor = new EloSucessor();
-		novoSucessor.id = sucessor;
-		novoSucessor.prox = sucessorCorrente;
-		predecessor.listaSuc = novoSucessor;
-	}
-
-
-	// O(n)
-	private Elo buscar(int chave) {
-		return this.prim != null ? this.buscarRecursivo(chave, this.prim) : null;
-	}
-
-	// O(n)
-	private Elo buscarRecursivo(int chave, Elo eloCorrente) {
-		if (eloCorrente == null) return null;
-		if (chave == eloCorrente.chave) return eloCorrente;
-
-		return this.buscarRecursivo(chave, eloCorrente.prox);
-	}
-*/
-
+	//O(n*m)
 	private void debug()
 	{
 		for (Elo p = this.prim; p != null; p = p.prox) {
