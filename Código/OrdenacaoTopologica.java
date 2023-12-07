@@ -1,12 +1,22 @@
+package br.unirio;
+
+import java.io.File;
 import java.util.*;
 
 public class OrdenacaoTopologica
 {
 	private class Elo
 	{
+		/* Identifica��o do elemento. */
 		public int chave;
+
+		/* N�mero de predecessores. */
 		public int contador;
+
+		/* Aponta para o pr�ximo elo da lista. */
 		public Elo prox;
+
+		/* Aponta para o primeiro elemento da lista de sucessores. */
 		public EloSucessor listaSuc;
 
 		public Elo()
@@ -27,7 +37,10 @@ public class OrdenacaoTopologica
 
 	private class EloSucessor
 	{
+		/* Aponta para o elo que � sucessor. */
 		public Elo id;
+
+		/* Aponta para o pr�ximo elemento. */
 		public EloSucessor prox;
 
 		public EloSucessor()
@@ -43,7 +56,11 @@ public class OrdenacaoTopologica
 		}
 	}
 
+
+	/* Ponteiro (refer�ncia) para primeiro elemento da lista. */
 	private Elo prim;
+
+	/* N�mero de elementos na lista. */
 	private int n;
 
 	public OrdenacaoTopologica()
