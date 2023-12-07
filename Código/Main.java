@@ -8,13 +8,17 @@ public class Main
 		final double prob = 0.13;
 		OrdenacaoTopologica ord = new OrdenacaoTopologica();
 		//Colocar o caminho inteiro até o arquivo de entrada
-		String nomeEntrada = "C:\\Users\\Emidio\\Desktop\\Trabalho Final\\Código\\entrada.txt";
+		String nomeEntrada = "C:\\Users\\Emidio\\Desktop\\Trabalho Final\\entrada.txt";
 
 
-
+		//Método para ler o arquivo de entrada
 		//ord.realizaLeitura(nomeEntrada);
-		//ord.geraGrafo(numeroVertices, 0.13);
+		//ord.executaEntrada();
+
+		//Método inicial para rodar os testes
 		//ord.incializar();
+
+		//Método para execução normal do código
 		ord.executa(numeroVertices, prob);
 
 

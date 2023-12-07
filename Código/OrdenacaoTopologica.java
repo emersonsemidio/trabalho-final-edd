@@ -289,6 +289,12 @@ public class OrdenacaoTopologica
 		}
 	}
 
+	public void executaEntrada(){
+		this.debug();
+		this.listaSemPredecessores();
+		this.imprimirElementos();
+	}
+
 	public boolean executa(int tam, double prob)
 	{
 		geraGrafo(tam, prob);
