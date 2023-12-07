@@ -1,21 +1,12 @@
-package br.unirio;
-
 import java.util.*;
 
 public class OrdenacaoTopologica
 {
 	private class Elo
 	{
-		/* Identifica��o do elemento. */
 		public int chave;
-
-		/* N�mero de predecessores. */
 		public int contador;
-
-		/* Aponta para o pr�ximo elo da lista. */
 		public Elo prox;
-
-		/* Aponta para o primeiro elemento da lista de sucessores. */
 		public EloSucessor listaSuc;
 
 		public Elo()
@@ -36,10 +27,7 @@ public class OrdenacaoTopologica
 
 	private class EloSucessor
 	{
-		/* Aponta para o elo que � sucessor. */
 		public Elo id;
-
-		/* Aponta para o pr�ximo elemento. */
 		public EloSucessor prox;
 
 		public EloSucessor()
@@ -55,11 +43,7 @@ public class OrdenacaoTopologica
 		}
 	}
 
-
-	/* Ponteiro (refer�ncia) para primeiro elemento da lista. */
 	private Elo prim;
-
-	/* N�mero de elementos na lista. */
 	private int n;
 
 	public OrdenacaoTopologica()
@@ -125,8 +109,8 @@ public class OrdenacaoTopologica
 
 	public double medirTempoMedio(int valor) {
 		// Roda a função 10 vezes e calcula o tempo médio
-		long[] tempos = new long[10];
-		for (int i = 0; i < 10; i++) {
+		long[] tempos = new long[4];
+		for (int i = 0; i < 4; i++) {
 			long inicio = System.currentTimeMillis();
 			geraGrafo(valor, 0.13);
 			long fim = System.currentTimeMillis();
@@ -216,7 +200,6 @@ public class OrdenacaoTopologica
 
 	//O(n)
 	public void listaSemPredecessores(){
-
 		Elo p = prim;
 		Elo antigoPrim;
 		prim = null;
@@ -237,10 +220,7 @@ public class OrdenacaoTopologica
 					prim = novoElo;
 					prim.prox = antigoPrim;
 				}
-
-
 			}
-
 		}
 	}
 

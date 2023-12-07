@@ -1,5 +1,3 @@
-package br.unirio;
-
 public class Main
 {
 	public static void main(String args[])
@@ -18,7 +16,7 @@ public class Main
 
 		/*
 
-			Criar uma Lista com os Elementos que não tem predecessores
+			Criar uma Lista com os Elementos que nï¿½o tem predecessores
 
 				 busca elementos sem predecessores
 				p = prim; prim = NULL;
@@ -36,7 +34,7 @@ public class Main
 				para cada elemento q da lista de elementos com zero
 				predecessores
 					 imprimir a chave de q;
-				 		decrementar o número de elementos da lista (n);
+				 		decrementar o nï¿½mero de elementos da lista (n);
 				 			para cada elemento t da lista de sucessores de q
 				 decrementar o contador do predecessor de t
 				 se o contador de t se tornar zero,
